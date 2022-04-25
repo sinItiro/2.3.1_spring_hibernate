@@ -1,12 +1,14 @@
 package web.controller;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import web.dao.UserDAO;
 import web.model.User;
+import web.model.UserService;
 
 import javax.validation.Valid;
 
@@ -14,10 +16,10 @@ import javax.validation.Valid;
 @RequestMapping("/users")
 public class UsersController {
 
-    private UserDAO userDAO;
+    private UserService userService;
 
-    public UsersController(UserDAO userDAO) {
-        this.userDAO = userDAO;
+    public UsersController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping()
@@ -25,13 +27,13 @@ public class UsersController {
 
         //HttpServletRequest request
         //String count = request.getParameter("count");
-        model.addAttribute("users", userDAO.usersList());
+        model.addAttribute("users", userService.usersList());
         return "users/users";
     }
 
     @GetMapping(value = "/{id}")
     public String getUser(ModelMap model, @PathVariable("id") int id) {
-        model.addAttribute("user", userDAO.getUser(id));
+        model.addAttribute("user", userService.getUser(id));
         return "users/user";
     }
 
@@ -47,13 +49,13 @@ public class UsersController {
         if (bindingResult.hasErrors()) {
             return "/users/new";
         }
-        userDAO.save(user);
+        userService.save(user);
         return "redirect:/users";
     }
 
     @GetMapping("/{id}/edit")
     public String editUser(ModelMap model, @PathVariable("id") long id) {
-        model.addAttribute("user", userDAO.getUser(id));
+        model.addAttribute("user", userService.getUser(id));
         return "users/edit";
     }
 
@@ -63,13 +65,13 @@ public class UsersController {
         if (bindingResult.hasErrors()) {
             return "/users/edit";
         }
-        userDAO.update(id, user);
+        userService.update(id, user);
         return "redirect:/users";
     }
 
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable("id") long id) {
-        userDAO.delete(id);
+        userService.delete(id);
         return "redirect:/users";
     }
 }
